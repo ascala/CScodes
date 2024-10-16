@@ -1,0 +1,5 @@
+- **MC1d.py**: routines for a one-particle Monte Carlo in a 1d potential 
+- **Brown1d.py**: routines for a one-particle Brownian dynamics in a 1d potential   
+- **autocorrelation.py**: routines to calculate the autocorrelation function   
+- **test_MC1d.py**:   example of a Monte Carlo simulation
+- **test_Brown1d.py**: example of a Brownian simulation
