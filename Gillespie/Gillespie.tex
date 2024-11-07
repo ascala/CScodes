@@ -1,0 +1,108 @@
+\documentclass{article}
+\usepackage{amsmath}
+\usepackage{graphicx}
+\usepackage{listings}
+\usepackage{xcolor}
+
+\title{Gillespie Stochastic Simulation Method}
+\author{Your Name}
+\date{\today}
+
+\begin{document}
+
+\maketitle
+
+\section{Introduction}
+The Gillespie algorithm is a stochastic simulation method used to model the time evolution of chemical reactions. It is particularly useful for systems where the number of molecules is small, and random fluctuations can significantly affect the dynamics.
+
+\section{Basic Concepts}
+In a chemical system, reactions can be represented as:
+\[
+\text{Reactants} \xrightarrow{k} \text{Products}
+\]
+where \( k \) is the reaction rate. The Gillespie method simulates the system by determining the time until the next reaction occurs and which reaction will take place.
+
+\section{Propensity Functions}
+The propensity function \( a_i \) for each reaction \( i \) is defined as:
+\[
+a_i = k_i \prod_{j} \frac{[X_j]^{\nu_{ji}}}{\nu_{ji}!}
+\]
+where:
+- \( k_i \) is the rate constant for reaction \( i \),
+- \( [X_j] \) is the concentration of reactant \( j \),
+- \( \nu_{ji} \) is the stoichiometric coefficient of reactant \( j \) in reaction \( i \).
+
+The total propensity \( a_0 \) is given by:
+\[
+a_0 = \sum_{i} a_i
+\]
+
+\section{Algorithm Steps}
+The Gillespie algorithm follows these steps:
+\begin{enumerate}
+    \item Calculate the propensity functions \( a_i \) for all reactions.
+    \item Compute the total propensity \( a_0 \).
+    \item Generate a random number \( r_1 \) to determine the time until the next reaction:
+    \[
+    \tau = \frac{1}{a_0} \ln\left(\frac{1}{r_1}\right)
+    \]
+    \item Generate another random number \( r_2 \) to select which reaction occurs based on the probabilities \( \frac{a_i}{a_0} \).
+    \item Update the state of the system based on the selected reaction.
+    \item Repeat until the maximum simulation time is reached or no reactions can occur.
+\end{enumerate}
+
+\section{Code Implementation}
+The following Python code implements the Gillespie algorithm:
+
+\begin{lstlisting}[language=Python, caption=Gillespie Simulation Code, basicstyle=\ttfamily\small, keywordstyle=\color{blue}]
+import numpy as np
+import matplotlib.pyplot as plt
+
+def gillespie_simulation(reactants, products, rates, initial_state, reactant_names, max_time):
+    state = np.array(initial_state)
+    time = 0
+    times = [time]
+    states = [state.copy()]
+
+    while time < max_time:
+        propensities = rates * np.prod(state[None, :] ** reactants, axis=1)
+        total_propensity = np.sum(propensities)
+
+        if total_propensity == 0:
+            break
+
+        tau = np.random.exponential(1 / total_propensity)
+        time += tau
+
+        reaction_index = np.random.choice(len(rates), p=propensities / total_propensity)
+        state -= reactants[reaction_index]
+        state += products[reaction_index]
+
+        times.append(time)
+        states.append(state.copy())
+
+    return times, states
+\end{lstlisting}
+
+\section{Example Usage}
+The following example demonstrates how to set up and run the Gillespie simulation:
+
+\begin{lstlisting}[language=Python, caption=Example Usage, basicstyle=\ttfamily\small]
+reactants = np.array([[1, 1, 0],  # A + B
+                      [0, 0, 2]]) # 2C
+
+products = np.array([[0, 0, 2],  # 2C
+                     [1, 1, 0]]) # A + B
+
+rates = [0.5, 0.2]  # Reaction rates
+initial_state = [50, 50, 0]  # Initial number of A, B, and C molecules
+max_time = 100  # Maximum simulation time
+reactant_names = ['A', 'B', 'C']  # Names for the reactants
+
+times, states = gillespie_simulation(reactants, products, rates, initial_state, reactant_names, max_time)
+\end{lstlisting}
+
+\section{Conclusion}
+The Gillespie algorithm provides a powerful tool for simulating stochastic processes in chemical systems. By understanding the underlying principles and implementing the algorithm, researchers can gain insights into the dynamics of complex reactions.
+
+\end{document}
