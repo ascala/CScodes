@@ -1,5 +1,6 @@
 import numpy as np
 import matplotlib.pyplot as plt
+import scienceplots
 # Import Brownian routines, forces and potential from Brown1d.py
 from Brown1d import V,dV_dx,Brown1d_simulation  
 # Import autocorrelation functions defined in autocorrelation.py
@@ -18,6 +19,7 @@ sigma = np.sqrt(2 / beta)  # Diffusion coefficient
 # Run the simulation
 positions = Brown1d_simulation(x_init, n_steps, sigma, dt)
 
+plt.style.use('science') # Use the scientific papers' custom style for plplot
 
 fig1=plt.figure() # first figure
 
